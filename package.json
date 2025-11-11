@@ -2,7 +2,7 @@
   "name": "js_week_3",
   "version": "1.0.0",
   "description": "",
-  "main": "express-intro/app.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
