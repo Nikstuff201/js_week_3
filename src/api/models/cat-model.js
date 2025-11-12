@@ -11,10 +11,10 @@ const cats = [{
 
 const listAllCats = () => {return cats}
 
-const addCat = (cat) => {
-  const {name, birthdate, weight, owner, image} = cat;
+const addCat = (cat,filename) => {
+  const {name, birthdate, weight, owner} = cat;
   const newId = cats[0].cat_id + 1;
-  cats.unshift({cat_id: newId, name, birthdate, weight, owner, image});
+  cats.unshift({cat_id: newId, name, birthdate, weight, owner, image: filename});
   return {cat_id: newId};
 }
 
