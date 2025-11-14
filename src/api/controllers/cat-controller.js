@@ -7,14 +7,15 @@ import {
 } from '../models/cat-model.js';
 
 
-const getAllCats = (req, res) => {
-  res.json(listAllCats());
+const getAllCats = async (req, res) => {
+  const cats = await listAllCats();
+  res.json(cats);
 };
 
-const postCat = (req, res) => {
+const postCat = async (req, res) => {
   console.log('Form data:', req.body);
   console.log('File data:', req.file);
-  const result = addCat(req.body, req.file.filename);
+  const result = await addCat(req.body, req.file.filename);
   if (result.cat_id) {
     res.status(201).json({message: 'New cat added.', result});
   } else {
@@ -22,8 +23,8 @@ const postCat = (req, res) => {
   }
 };
 
-const getCatById = (req, res) => {
-  const cat = findCatById(req.params.id);
+const getCatById = async (req, res) => {
+  const cat = await findCatById(req.params.id);
   if (cat) {
     res.json(cat);
   } else {
@@ -31,20 +32,20 @@ const getCatById = (req, res) => {
   }
 };
 
-const putCat = (req, res) => {
-  const result = findCatById(req.params.id);
+const putCat = async (req, res) => {
+  const result = await findCatById(req.params.id);
   if (result) {
-    const message = updateCat(result.cat_id, req.body);
+    const message = await updateCat(result.cat_id, req.body);
     res.status(200).json(message);
   } else {
     res.sendStatus(404);
   }
 };
 
-const deleteCat = (req, res) => {
-  const result = findCatById(req.params.id);
+const deleteCat = async (req, res) => {
+  const result = await findCatById(req.params.id);
   if (result) {
-    const message = removeCat(result.cat_id);
+    const message = await removeCat(result.cat_id);
     res.status(200).json(message);
   } else {
     res.sendStatus(404);

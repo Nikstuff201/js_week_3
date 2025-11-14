@@ -8,6 +8,7 @@ import {getAllCats, postCat, getCatById, putCat, deleteCat} from  '../controller
 const upload = multer({dest: 'uploads/'})
 const catRouter = express.Router();
 
+
 catRouter.route('/').get(getAllCats).post(upload.single('file'),createThumbnail,postCat)
 catRouter.route('/:id').get(getCatById).put(putCat).delete(deleteCat)
 
