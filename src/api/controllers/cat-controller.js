@@ -4,6 +4,7 @@ import {
   addCat,
   updateCat,
   removeCat,
+  getUserCats,
 } from '../models/cat-model.js';
 
 
@@ -33,9 +34,10 @@ const getCatById = async (req, res) => {
 };
 
 const putCat = async (req, res) => {
+  console.log('Form data:', req.body);
   const result = await findCatById(req.params.id);
   if (result) {
-    const message = await updateCat(result.cat_id, req.body);
+    const message = await updateCat(req.body, result.cat_id);
     res.status(200).json(message);
   } else {
     res.sendStatus(404);
@@ -52,4 +54,9 @@ const deleteCat = async (req, res) => {
   }
 };
 
-export {getAllCats, getCatById, postCat, putCat, deleteCat};
+const getCatsByUser = async (req, res) => {
+  const result = await getUserCats(req.params.id);
+  res.json(result);
+};
+
+export {getAllCats, getCatById, postCat, putCat, deleteCat, getCatsByUser};

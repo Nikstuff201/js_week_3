@@ -1,43 +1,68 @@
 'use strict';
 
-const userItems = [
-  {
-    user_id: 3609,
-    name: 'John Doe',
-    username: 'johndoe',
-    email: 'john@metropolia.fi',
-    role: 'user',
-    password: 'password',
-  }];
+import promisePool from '../../utils/database.js';
 
-const listAllUsers = () => {return userItems;};
 
-const addUser = (user) => {
-  const {name, username, email, role, password} = user;
-  const newId = userItems[0].user_id + 1;
-  userItems.unshift({user_id: newId, name, username, email, role, password});
-  return {user_id: newId};
-}
+const listAllUsers = async () => {
+  const [rows] = await promisePool.execute('SELECT * FROM wsk_users');
+  console.log('rows', rows);
+  return rows;
+};
 
-const findUserById = (id) => {
-  return userItems.find(user => user.user_id === parseInt(id));
-}
-
-const updateUser = (id, user) => {
-  for (let i=0; i<=userItems.length; i++){
-    if (parseInt(id) === userItems[i].user_id){
-      userItems.splice(i,1);
-      const {name, username, email, role, password} = user;
-      userItems[i]={user_id: id, name, username, email, role, password};
-      return {message: 'User item updated.'}
-    }
+const addUser = async (user) => {
+  const {name, username, email, password, role} = user;
+  const sql = `INSERT INTO wsk_users (name, username, email, password, role)
+               VALUES (?, ?, ?, ?, ?)`;
+  const params = [name, username, email, password, role];
+  const rows = await promisePool.execute(sql, params);
+  console.log('rows', rows);
+  if (rows[0].affectedRows === 0) {
+    return false;
   }
-}
+  return {user_id: rows[0].insertId};
+};
 
-const removeUser = (id) => {
-  const index = userItems.findIndex(user => user.user_id === parseInt(id));
-  userItems.splice(index, 1);
-  return {message: 'User item deleted.'}
-}
+const findUserById = async (id) => {
+  const [rows] = await promisePool.execute('SELECT * FROM wsk_users WHERE user_id = ?', [id]);
+  console.log('rows', rows);
+  if (rows.length === 0) {
+    return false;
+  }
+  return rows[0];
+};
+
+const updateUser = async (id, user) => {
+  const sql = promisePool.format(`UPDATE wsk_users
+                                  SET ?
+                                  WHERE user_id = ?`, [user, id]);
+  const rows = await promisePool.execute(sql);
+  if (rows[0].affectedRows === 0) {
+    return false;
+  }
+  return {message: 'success'};
+};
+
+const removeUser = async (id) => {
+  const connection = await promisePool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    await connection.execute(`DELETE
+                              FROM wsk_cats
+                              WHERE owner = ?`, [id]);
+    await connection.execute(`DELETE
+                              FROM wsk_users
+                              WHERE user_id = ?`, [id]);
+
+    await connection.commit();
+    connection.release();
+    return {message: 'success'};
+  } catch (e) {
+    await connection.rollback();
+    connection.release();
+    console.log(e);
+    return false;
+  }
+};
 
 export {listAllUsers, addUser, updateUser, removeUser, findUserById};
