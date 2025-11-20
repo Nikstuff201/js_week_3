@@ -65,4 +65,23 @@ const removeUser = async (id) => {
   }
 };
 
-export {listAllUsers, addUser, updateUser, removeUser, findUserById};
+const findUserByUsername = async (user) => {
+  const sql = `SELECT *
+               FROM wsk_users
+               WHERE username = ?`;
+  const [rows] = await promisePool.execute(sql,[user]);
+  if (rows.length === 0) {
+    return false;
+  }
+  return rows[0];
+};
+
+
+export {
+  listAllUsers,
+  addUser,
+  updateUser,
+  removeUser,
+  findUserById,
+  findUserByUsername,
+};

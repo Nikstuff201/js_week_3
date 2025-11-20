@@ -37,8 +37,12 @@ const putCat = async (req, res) => {
   console.log('Form data:', req.body);
   const result = await findCatById(req.params.id);
   if (result) {
-    const message = await updateCat(req.body, result.cat_id);
-    res.status(200).json(message);
+    if (res.locals.user.user_id !== result.owner_Id && res.locals.user.role !== 'admin') {
+      res.sendStatus(403);
+    } else {
+      const message = await updateCat(req.body, result.cat_id);
+      res.status(200).json(message);
+    }
   } else {
     res.sendStatus(404);
   }
@@ -47,8 +51,12 @@ const putCat = async (req, res) => {
 const deleteCat = async (req, res) => {
   const result = await findCatById(req.params.id);
   if (result) {
-    const message = await removeCat(result.cat_id);
-    res.status(200).json(message);
+    if (res.locals.user.user_id !== result.owner_Id && res.locals.user.role !== 'admin') {
+      res.sendStatus(403);
+    } else {
+      const message = await removeCat(result.cat_id);
+      res.status(200).json(message);
+    }
   } else {
     res.sendStatus(404);
   }
