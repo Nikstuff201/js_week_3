@@ -15,9 +15,6 @@ const addCat = async (cat, filename) => {
   const params = [cat_name, weight, owner, filename, birthdate];
   const rows = await promisePool.execute(sql, params);
   console.log('rows', rows);
-  if (rows[0].affectedRows === 0) {
-    return false;
-  }
   return {cat_id: rows[0].insertId};
 };
 
@@ -53,8 +50,8 @@ const removeCat = async (id) => {
 
 const getUserCats = async (id) => {
   const [rows] = await promisePool.execute('SELECT * FROM wsk_cats WHERE owner = ?', [id]);
-  console.log('rows', rows)
-  return rows
+  console.log('rows', rows);
+  return rows;
 };
 
 export {listAllCats, addCat, updateCat, removeCat, findCatById, getUserCats};

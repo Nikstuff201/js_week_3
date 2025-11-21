@@ -8,13 +8,15 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
   console.log('token', token);
   if (token == null) {
-    return res.sendStatus(401);
+    const error = new Error('No token provided');
+    error.status = 401;
+    return next(error);
   }
   try {
     res.locals.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch (e) {
-    res.status(403).send({message: 'invalid token'});
+    return next(e);
   }
 };
 

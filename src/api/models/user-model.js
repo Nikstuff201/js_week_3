@@ -16,9 +16,6 @@ const addUser = async (user) => {
   const params = [name, username, email, password, role];
   const rows = await promisePool.execute(sql, params);
   console.log('rows', rows);
-  if (rows[0].affectedRows === 0) {
-    return false;
-  }
   return {user_id: rows[0].insertId};
 };
 
